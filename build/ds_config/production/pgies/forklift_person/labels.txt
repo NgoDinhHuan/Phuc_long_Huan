@@ -1,0 +1,12 @@
+forklift
+electric_pallet_jack
+reach_truck
+truck
+pallet
+person
+person_visible_clothes
+person_use_phone
+Person_eat_drink
+person_carry_object
+person_pull_object
+security_person

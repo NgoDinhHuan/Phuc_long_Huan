@@ -1,0 +1,17 @@
+pyds_ext 
+opencv_python 
+apsw
+requests 
+minio 
+netifaces 
+kafka-python  
+tabulate 
+pillow
+pycairo
+sqlalchemy
+psycopg2-binary
+requests
+loguru
+pydantic
+pynvml
+psutil

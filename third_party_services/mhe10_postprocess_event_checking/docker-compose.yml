@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mhe10_postprocess:
+    build: 
+      context: .
+      dockerfile: mhe10.Dockerfile
+    container_name: mhe10_postprocess
+    networks:
+      - eme_network
+
+networks:
+  eme_network:
+    external: true

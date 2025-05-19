@@ -1,0 +1,58 @@
+input_control {
+  process_mode : PROCESS_MODE_CLIP_OBJECTS
+  interval : 0
+  operate_on_gie_id: 104
+  object_control { 
+    bbox_filter { 
+      min_width: 30 
+      min_height: 30 
+    }
+  }
+}
+
+output_control {
+  classifier_type: "par"
+}
+
+infer_config {
+  unique_id: 204
+  gpu_ids: [0]
+  max_batch_size: 32
+
+  backend {
+    triton {
+      model_name: "par_2609"
+      version: 2
+      grpc {
+        url: "tritonserver:8001"
+        enable_cuda_buffer_sharing: true
+      }
+    }
+  }
+
+  preprocess {
+    network_format: IMAGE_FORMAT_RGB
+    tensor_order: TENSOR_ORDER_LINEAR
+    tensor_name: "input"
+
+    normalize {
+      scale_factor: 0.01735207357279195
+      channel_offsets: [123.675,116.28,103.53]
+    }
+  }
+
+  postprocess {
+    labelfile_path: "labels.txt"
+    classification {
+      threshold: 0.6
+      custom_parse_classifier_func: "NvDsInferClassiferParseCustomSigmoid"
+    }
+  }
+
+  extra {
+    copy_input_to_host_buffers: false
+  }
+  custom_lib {
+    path : "/nvdsinfer_custom_impl_par/libnvds_infercustomparser.so"
+  }
+} 

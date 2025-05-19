@@ -1,0 +1,8 @@
+pallet-with-box
+pallet
+pallet_truck
+forklift
+box
+small_load_carrier
+person
+stillage

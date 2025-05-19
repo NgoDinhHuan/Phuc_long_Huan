@@ -1,0 +1,25 @@
+VERSION_ONNX=1
+VERSION_PLAN=1
+  ["yolov8m_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':16x3x640x640 --maxShapes='input':32x3x640x640"
+  ["forklift_product_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':16x3x640x640 --maxShapes='input':32x3x640x640"
+  ["alcohol_person_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':8x3x640x640 --maxShapes='input':16x3x640x640"
+  ["product_fall_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':16x3x640x640 --maxShapes='input':32x3x640x640"
+  ["par_2609"]="--fp16 --minShapes='input':1x3x256x192 --optShapes='input':16x3x256x192 --maxShapes='input':32x3x256x192"
+  ["ppe02_classification_trt"]="--fp16 --minShapes='input':1x3x224x224 --optShapes='input':16x3x224x224 --maxShapes='input':32x3x224x224"
+
+VERSION_ONNX=1
+VERSION_PLAN=2  # increase batch size
+  ["yolov8m_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':32x3x640x640 --maxShapes='input':64x3x640x640"
+  ["forklift_product_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':32x3x640x640 --maxShapes='input':64x3x640x640"
+  ["alcohol_person_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':16x3x640x640 --maxShapes='input':32x3x640x640"
+  ["product_fall_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':16x3x640x640 --maxShapes='input':32x3x640x640"
+  ["par_2609"]="--fp16 --minShapes='input':1x3x256x192 --optShapes='input':32x3x256x192 --maxShapes='input':64x3x256x192"
+  ["ppe02_classification_trt"]="--fp16 --minShapes='input':1x3x224x224 --optShapes='input':16x3x224x224 --maxShapes='input':32x3x224x224"
+
+
+  ["yolov8m_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':32x3x640x640 --maxShapes='input':64x3x640x640"
+  ["forklift_product_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':32x3x640x640 --maxShapes='input':64x3x640x640"
+  ["alcohol_person_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':16x3x640x640 --maxShapes='input':32x3x640x640"
+  ["product_fall_trt"]="--fp16 --minShapes='input':1x3x640x640 --optShapes='input':16x3x640x640 --maxShapes='input':32x3x640x640"
+  ["par_2609"]="--fp16 --minShapes='input':1x3x256x192 --optShapes='input':32x3x256x192 --maxShapes='input':64x3x256x192"
+  ["ppe02_classification_trt"]="--fp16 --minShapes='input':1x3x224x224 --optShapes='input':16x3x224x224 --maxShapes='input':32x3x224x224"

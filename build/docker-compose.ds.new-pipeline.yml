@@ -1,0 +1,56 @@
+services:
+
+  ds_warehouse:
+    image: ${DS_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ${DEEPSTREAM_MODEL_DIR}:/models
+      - ${DEEPSTREAM_CONFIG_PATH}:/configs
+      - ./deepstream_logs:/logs
+    working_dir: /ds_app
+    environment:
+      - MODEL_NAME=ds_warehouse
+      - NVIDIA_VISIBLE_DEVICES=0
+      - GST_DEBUG=2
+      - LOGLEVEL="INFO"
+      - GST_DEBUG_FILE=/ds_app/GST_DEBUG_new_pipeline.log
+      - PYTHONUNBUFFERED=1
+      - KAFKA_BROKER=${KAFKA_BROKER}
+      - KAFKA_TOPIC_DVR=${KAFKA_TOPIC_DVR}
+      - FRAME_PROCESS_INTERVAL=5
+      - BATCH_SIZE_PROCESS=30
+      - BATCH_SIZE_TRITON=32
+      - FILE_SINK=0
+      - TEST=${TEST}
+      - DEPLOY_ENV=${DEPLOY_ENV}
+    deploy:
+      resources:
+        limits:
+          memory: 30g
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+          memory: 10g
+
+    healthcheck:
+      test: [ "CMD-SHELL", "test -s `which nvidia-smi` && nvidia-smi || exit 1" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+    command: ["python3", "process_new_pipeline_triton.py", "-n" , "new-pipeline-triton"]
+    networks:
+      - eme_network
+
+networks:
+  eme_network:
+    external: true

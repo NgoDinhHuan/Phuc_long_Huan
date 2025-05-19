@@ -1,0 +1,58 @@
+services:
+  stream_server:
+    image: ossrs/srs:v6.0.155
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - ./vms_server_cfg.conf:/usr/srs_cfg/vms.conf
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+    ports:
+      - ${DVR_STREAM_PORT}:18080
+      - ${DVR_LISTEN_PORT}:11935
+      - ${DVR_API_PORT}:11985
+    command: ./objs/srs -c /usr/srs_cfg/vms.conf
+
+  watchdog:
+    image: ${DVR_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./vms_server_cfg.conf:/usr/srs_cfg/vms.conf
+    working_dir: /app
+    environment:
+      - KAFKA_BROKER=${KAFKA_BROKER} # 47.128.81.230:8003 
+      - KAFKA_TOPIC_DVR=${KAFKA_TOPIC_DVR} # emagic.dvr_videos
+    command: bash -c "python dvr_watchdog.py"
+    networks:
+      - eme_network
+   
+  video_cleaner:
+    image: ${DVR_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/evidence_videos:/source_data
+      - ${SAVE_DATA_DIR}:/des_data
+    environment:
+      - CLEAN_TIME=24
+      - MOVE_FILE_TIME=24
+    command: bash -c "python video_cleaner.py"
+
+networks:
+  eme_network:
+    external: true

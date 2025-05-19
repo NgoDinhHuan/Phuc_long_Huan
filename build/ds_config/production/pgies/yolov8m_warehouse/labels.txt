@@ -1,0 +1,15 @@
+container
+forklift
+hand_pallet_jack
+electric_pallet_jack
+reach_truck
+product_package
+pallet
+Head
+Body
+Legs
+MHE_Lifter
+MHE_Body
+Alcohol_testing_tool
+truck
+person

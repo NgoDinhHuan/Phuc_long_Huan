@@ -1,0 +1,9 @@
+forklift
+hand_pallet_jack
+electric_pallet_jack
+reach_truck
+truck
+pallet
+product_box
+product_package
+pallet_package

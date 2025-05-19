@@ -1,0 +1,10 @@
+__pycache__/
+**__pycache__/
+.env
+**.o
+**.so
+**.log
+**.engine
+**.onnx
+output/*
+**.mp4

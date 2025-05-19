@@ -1,0 +1,5 @@
+forklift
+pallet
+pallet_truck
+person
+small_load_carrier

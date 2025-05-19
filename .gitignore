@@ -1,0 +1,39 @@
+**.o
+**.so
+
+# Byte-compiled / optimized / DLL files
+*__pycache__/
+**/*_pb2_grpc.py
+**/*_pb2.py
+**/*.jpeg
+**/*.jpg
+**/*.png
+**/*.pt
+**/*-data
+**/*.mp4
+**/*.mp4.tmp
+**/*.avi
+**/*.mov
+**/*.mkv
+*output
+*video
+**/*.onnx
+
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+.idea
+**/.DS_Store
+.env
+.venv/
+build/dev_env/
+
+# test_volumes
+test_volumes/
+build/data/
+build/data2/

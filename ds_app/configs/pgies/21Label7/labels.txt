@@ -1,0 +1,21 @@
+Forklift
+Hand pallet jack
+Electric pallet jack
+Reach truck
+Truck
+Pallet
+Product box
+Product package
+Pallen package
+Person
+Person wear visible clothes
+Person using phone
+Person eating or drinking
+Person carring object
+Person pull object
+Alcohol testing tool
+Firefighting equiment
+Wheel Chocks
+Beacon light
+No_beacon light
+Security person

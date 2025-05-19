@@ -1,0 +1,30 @@
+services:
+  tritonserver:
+    image: nvcr.io/nvidia/tritonserver:24.08-py3
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    ports:
+      - 8000
+      - 8001
+      - 8002
+    environment:
+#      - VERSION_ONNX=1
+#      - VERSION_PLAN=2
+      - BASE_URL=http://192.168.1.92:9000/cloud-ai-models/infer/onnx
+    volumes:
+      - ./repo:/app/models
+      - ./run_tritonserver.sh:/app/run_tritonserver.sh
+    working_dir: /app
+    command: ["/bin/bash", "-c", "chmod +x run_tritonserver.sh && ./run_tritonserver.sh"]
+    networks:
+      - eme_network
+
+networks:
+  eme_network:
+    external: true

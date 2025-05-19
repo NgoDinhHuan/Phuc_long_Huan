@@ -1,0 +1,27 @@
+services:
+  experiment:
+    image: emagiceye-experiment-app:base
+    environment:
+      DATABASE_URL: ${DATABASE_URL} # postgresql://eme_db:48554f2d6defd93cb67b392acc1256c11fbe114b927b6e7dbd22a8053d76df2f@192.168.1.92:51001/postgres?sslmode=disable
+      APP_NAME: VEH01
+      KAFKA_BROKER: ${KAFKA_BROKER} # 47.128.81.230:8003
+      EVENT_KAFKA_BROKER: ${EVENT_KAFKA_BROKER}
+      KAFKA_VEHICLE_TOPIC: ${KAFKA_VEHICLE_TOPIC} #vemagic.vehicle
+      KAFKA_EVENT_TOPIC: ${KAFKA_EVENT_TOPIC} # emagic.events
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC} # emagic.evidence
+      STORAGE_URL: ${STORAGE_URL} # 192.168.1.92:51003
+      STORAGE_DOMAIN_URL: ${STORAGE_DOMAIN_URL} # minio.emagiceyes.rainscales.com
+      STORAGE_BUCKET: ${STORAGE_BUCKET} # emagic-event
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY} # minioadmin
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY} # minioadmin
+      STORAGE_SECURE: ${STORAGE_SECURE} # false
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_FORKLIFT_PERSON} # emagic.warehouse
+      KAFKA_PRODUCT_TOPIC: ${KAFKA_PRODUCT_TOPIC} # emagic.products
+    tty: true        
+    working_dir: /app
+    volumes:
+      - ../:/app
+      - /hdd1/dannv5/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - /hdd1/dannv5/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro

@@ -1,0 +1,66 @@
+# Cpp Executable file
+*.out
+
+# Vscode 
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/c_cpp_properties.json
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Python
+*.pyc
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Raw video files
+*.i420
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Media files.
+*.mkv
+*.mp4
+*.dot
+*.jpeg
+
+# CodeLite
+*.session
+*.tags*
+*.db
+
+# files created running test
+*.csv
+*.txt
+
+# Directories

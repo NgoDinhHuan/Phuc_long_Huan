@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  kairos_llava_video:
+    container_name: kairos-llava-video
+    build: .
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - .:/app              
+    networks:
+      - kairos
+      
+networks:
+  kairos:
+    driver: bridge

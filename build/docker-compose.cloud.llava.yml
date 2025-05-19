@@ -1,0 +1,24 @@
+services:
+  llava:
+    image: ${LLAVA_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "8080"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - eme_network
+
+networks:
+  eme_network:
+    external: true

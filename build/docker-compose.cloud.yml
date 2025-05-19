@@ -1,0 +1,1226 @@
+services:
+  veh01:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: VEH01  # Truck not registered when moving in
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE}  # truck
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.VEH01.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  veh02:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: VEH02  # Truck not registered when moving out
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE}  # truck
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.VEH02.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+
+  mhe01:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: MHE01  # 3m rule
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # forklift
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.MHE01.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  mhe03:
+    image: ${CLOUD_IMAGE}
+    # restart: always
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+      resources:
+        limits:
+          memory: 8g
+        reservations:
+          memory: 1g
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: MHE03  # Crossing roads without stopping
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # forklift
+
+
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.MHE03.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  mhe09:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: MHE09  # "Detect forklift moving without visibility"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # forklift, product_package
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.MHE09.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+    
+  mhe04:
+    image: ${CLOUD_IMAGE}
+    # restart: always
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: MHE04  # "Detect forklift moving while load at height (12 pallet)"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # forklift, pallet
+
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.MHE04.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  mhe10:
+    image: ${CLOUD_IMAGE}
+    # restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: MHE10  # "Moving while load at height (product package at high)"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # forklift, product package
+
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.MHE10.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  par01:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PAR01  # "Using phone while operating MHE"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_PAR} # person, phone
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PAR01.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  par02:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PAR02  # "Using phone inside warehouse"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_PAR}  # person, phone
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PAR02.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  oth02:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: OTH02  # "Drugs/alcohol test completed"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE}  # alcohol_tool, person
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.OTH02.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  hm01:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: HM01  # "People do not climb on truck or jump off truck"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE}  # truck, person
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.HM01.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  hm02:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: HM02  # "People do not climb on dock or jump off dock"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # ???, person
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.HM02.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  hm03:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: HM03  # "Employee climbing on product"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # person, product_package, product_box
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.HM03.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  hm05:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: HM05  # "Warning when person not using walkway"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # person
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.HM05.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  hm07:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: HM07  # "Inactive people for more than 5 min"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # person
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.HM07.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  ppe01:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PPE01  # "People not wearing high visibility clothes"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # person, high_visible_clothes
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PPE01.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  ppe02:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PPE02  # "People not wearing safety shoes"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_PPE02} # person, no_safety_shoes
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PPE02.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  prd01:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PRD01  # "Products falling on the floor"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE}
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PRD01.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  veh03:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: VEH03  # "Truck loading more than X minutes"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_SLOW}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE}  # truck
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.VEH03.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  par03:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PAR03  # "Staff Gathering"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # person
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PAR03.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  pl02:
+    image: ${CLOUD_IMAGE}
+    # restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PL02  # Pallet standing on the floor more than 60 minutes
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_SLOW}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # pallet
+
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PL02.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+  pl03:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: PL03  # Pallet standing on the floor more than 60 minutes
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_SLOW}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # pallet
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.PL03.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  tcount:
+    image: ${CLOUD_IMAGE}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: TCOUNT  # "Truck counting"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE} # truck
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.TCOUNT.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+      
+  mhe07:
+    image: ${CLOUD_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: MHE07  # "MHE parking at wrong place"
+
+
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST}
+      KAFKA_DEEPSTREAM_TOPIC: ${KAFKA_TOPIC_WAREHOUSE}
+
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 1g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.MHE07.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+    networks:
+      - eme_network
+
+  fast-evidence:
+    image: ${EVIDENCE_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: fast-evidence
+
+      LLAVA_URL: ${LLAVA_URL}
+      RECHECK_WITH_LLAVA: ${RECHECK_WITH_LLAVA}
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_FAST} # emagic.evidence.fast
+
+      EVENT_KAFKA_BROKER: ${EVENT_KAFKA_BROKER}
+      KAFKA_EVENT_TOPIC: ${KAFKA_EVENT_TOPIC} # emagic.events
+
+      # minio
+      STORAGE_URL: ${STORAGE_URL}
+      STORAGE_DOMAIN_URL: ${STORAGE_DOMAIN_URL}
+      STORAGE_BUCKET: ${STORAGE_BUCKET}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
+      STORAGE_SECURE: ${STORAGE_SECURE}
+
+      EME_EVENTS_COLLECTOR_URL: http://eme_events_exporter:9042/events
+
+    deploy:
+      resources:
+        limits:
+          memory: 30g
+        reservations:
+          memory: 6g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.evidence.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+      - ./evidence_videos:/evidence
+    networks:
+      - eme_network
+
+  slow-evidence:
+    image: ${EVIDENCE_IMAGE}
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+      APP_NAME: slow-evidence
+
+      LLAVA_URL: ${LLAVA_URL}
+      RECHECK_WITH_LLAVA: ${RECHECK_WITH_LLAVA}
+
+      EME_DOMAIN: ${EME_DOMAIN}
+      EME_API_KEY: ${EME_API_KEY}
+
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      KAFKA_EVIDENCE_TOPIC: ${KAFKA_EVIDENCE_TOPIC_SLOW} # emagic.evidence.slow
+
+      EVENT_KAFKA_BROKER: ${EVENT_KAFKA_BROKER}
+      KAFKA_EVENT_TOPIC: ${KAFKA_EVENT_TOPIC} # emagic.events
+
+      # minio
+      STORAGE_URL: ${STORAGE_URL}
+      STORAGE_DOMAIN_URL: ${STORAGE_DOMAIN_URL}
+      STORAGE_BUCKET: ${STORAGE_BUCKET}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
+      STORAGE_SECURE: ${STORAGE_SECURE}
+
+      EME_EVENTS_COLLECTOR_URL: http://eme_events_exporter:9042/events
+
+    deploy:
+      resources:
+        limits:
+          memory: 10g
+        reservations:
+          memory: 2g
+
+    command:
+      [
+        "faust",
+        "-A",
+        "cloud_app.cmd.evidence.main",
+        "worker",
+        "-l",
+        "info"
+      ]
+    working_dir: /app
+    volumes:
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/videos:/videos
+      - ${BASE_DIR}/.deploy/RainScales/mge_ai_cloud/mge-ai-deploy-dev/data/dvr_videos:/usr/dvr_videos
+      - ./aicloud_logs:/logs
+      - ./evidence_videos:/evidence
+    networks:
+      - eme_network
+
+networks:
+  eme_network:
+    external: true
